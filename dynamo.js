@@ -1,31 +1,27 @@
 const AWS_CONFIG = require('./aws-config');
+const bodyParser = require('body-parser');
 
+const jsonParser = bodyParser.json();
 
 
 let AWS = require('aws-sdk');
 let express = require('express');
 let router = express.Router();
 
-
-const bodyParser = require('body-parser');
-
-const jsonParser = bodyParser.json();
-
-
 AWS.config.update(AWS_CONFIG);
 
    let docClient = new AWS.DynamoDB.DocumentClient();
 
-   let table = 'ally_users'
+   let table = 'Users'
 
 
    
-router.get('/', jsonParser, (req, res) => {
+router.get('/:phoneNumber', jsonParser,(req, res,next) => {
 
     let params = {
         TableName: table,
         Key: {
-            PhoneNumber: 123
+            PhoneNumber: req.params.phoneNumber
           }
     
     };
@@ -41,6 +37,85 @@ router.get('/', jsonParser, (req, res) => {
      });
     });
 
+
+router.put('/addContacts',jsonParser, (req, res,next) => {
+
+  let { phoneNumber, firstName, lastName, contacts} = req.body;
+
+var item = {
+ PhoneNumber : phoneNumber,
+  UserFirstName : firstName,
+   UserLastName : lastName,
+ contacts : contacts
+
+ }
+
+   var params = {
+                    TableName: table,
+                    Item : item
+                };
+
+     docClient.put(params, function(err, data) {
+           if (err) {
+                       console.log(err);
+                       handleError(err, res);
+                   } else {
+                       console.log(data.Item);
+                       handleSuccess(data.Item, res);
+                   }
+        });
+
+    });
+
+
+router.post('/register',jsonParser, (req, res,next) => {
+
+  let { phoneNumber, firstName, lastName } = req.body;
+
+var item = {
+ PhoneNumber : phoneNumber,
+  UserFirstName : firstName,
+  UserLastName : lastName
+
+ }
+
+   var params = {
+                    TableName: table,
+                    Item : item
+                };
+
+     docClient.put(params, function(err, data) {
+           if (err) {
+                       console.log(err);
+                       handleError(err, res);
+                   } else {
+                       console.log(data.Item);
+                       handleSuccess(data.Item, res);
+                   }
+        });
+
+    });
+
+router.get('/:phoneNumber', (req, res) => {
+
+    let params = {
+        TableName: table,
+        Key: {
+            PhoneNumber: req.params.phoneNumber
+          }
+
+    };
+
+    docClient.get(params, function (err, data) {
+        if (err) {
+            console.log(err);
+            handleError(err, res);
+        } else {
+            console.log(data.Item);
+            handleSuccess(data.Item, res);
+        }
+     });
+    });
 
 
     function handleError(err, res) {
