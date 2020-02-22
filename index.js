@@ -11,6 +11,14 @@ const { PORT, CLIENT_ORIGIN } = require('./config');
 
 const app = express();
 
+
+
+app.use(
+  cors({
+    origin: `${CLIENT_ORIGIN}`
+  })
+);
+
 app.use('/', dynamoRoute);
 
 // app.use(
@@ -19,11 +27,6 @@ app.use('/', dynamoRoute);
 //   })
 // );
 
-// app.use(
-//   cors({
-//     origin: CLIENT_ORIGIN
-//   })
-// );
 
 function runServer(port = PORT) {
   const server = app
