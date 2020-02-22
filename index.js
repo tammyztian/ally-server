@@ -3,24 +3,28 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+let {router: dynamoRoute} = require('./dynamo');
+
 
 const { PORT, CLIENT_ORIGIN } = require('./config');
-const { dbConnect } = require('./db-mongoose');
+//const { dbConnect } = require('./db-mongoose');
 // const {dbConnect} = require('./db-knex');
 
 const app = express();
 
-app.use(
-  morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
-    skip: (req, res) => process.env.NODE_ENV === 'test'
-  })
-);
+app.use('/', dynamoRoute);
 
-app.use(
-  cors({
-    origin: CLIENT_ORIGIN
-  })
-);
+// app.use(
+//   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
+//     skip: (req, res) => process.env.NODE_ENV === 'test'
+//   })
+// );
+
+// app.use(
+//   cors({
+//     origin: CLIENT_ORIGIN
+//   })
+// );
 
 function runServer(port = PORT) {
   const server = app
@@ -34,7 +38,7 @@ function runServer(port = PORT) {
 }
 
 if (require.main === module) {
-  dbConnect();
+  // dbConnect();
   runServer();
 }
 
