@@ -39,6 +39,8 @@ router.get('/:phoneNumber', jsonParser,(req, res,next) => {
 
 
 router.put('/addContacts',jsonParser, (req, res,next) => {
+    console.log(`addContacts hit`);
+    console.log(`this is request`, req);
 
   let { phoneNumber, firstName, lastName, contacts} = req.body;
 
@@ -84,6 +86,9 @@ router.put('/addContacts',jsonParser, (req, res,next) => {
 
 
 router.post('/register',jsonParser, (req, res,next) => {
+
+    console.log(`register hit`);
+    console.log(`this is request`, req);
 
   let { phoneNumber, firstName, lastName } = req.body;
 
