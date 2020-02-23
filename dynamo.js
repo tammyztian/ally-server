@@ -39,8 +39,6 @@ router.get('/:phoneNumber', jsonParser,(req, res,next) => {
 
 
 router.put('/addContacts',jsonParser, (req, res,next) => {
-    console.log(`addContacts hit`);
-    console.log(`this is request`, req);
 
   let { phoneNumber, firstName, lastName, contacts} = req.body;
 
@@ -66,21 +64,27 @@ router.put('/addContacts',jsonParser, (req, res,next) => {
         // add subscriptions
         var sns = new AWS.SNS();
 
-         params = {
-          Protocol: 'SMS',
-          TopicArn: 'arn:aws:sns:us-east-1:121394995974:'+ firstName + '-' + lastName,
-          Endpoint: '+19522612290',
-          ReturnSubscriptionArn: true
-        };
-        sns.subscribe(params, function(err, data) {
-          if (err) {
-                                                console.log(err);
-                                                handleError(err, res);
-                                            } else {
-                                                console.log("created Topic");
-                                                handleSuccess(data.Item, res);
-                                            }
-        });
+
+         contacts.map((item,key) => {
+           params = {
+                   Protocol: 'SMS',
+                   TopicArn: 'arn:aws:sns:us-east-1:121394995974:'+ firstName + '-' + lastName,
+                   Endpoint: item.PhoneNumber,
+                   ReturnSubscriptionArn: false
+                 };
+                 sns.subscribe(params, function(err, data) {
+                   if (err) {
+                                                         console.log(err);
+                                                         handleError(err, res);
+                                                     }
+                 });
+
+
+         });
+
+         res.json({ message: 'success', statusCode: 200})
+
+
 
     });
 
@@ -187,5 +191,6 @@ router.get('/publishMessage/:firstName/:LastName', (req, res) => {
     function handleSuccess(data, res) {
         res.json({ message: 'success', statusCode: 200, data: data })
     }
+
 
     module.exports = {router};
